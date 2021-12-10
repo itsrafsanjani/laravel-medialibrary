@@ -393,6 +393,81 @@ trait InteractsWithMedia
     }
 
     /*
+     * Last Media Start
+     */
+    public function getLastMedia(string $collectionName = 'default', $filters = []): ?Media
+    {
+        $media = $this->getMedia($collectionName, $filters);
+
+        return $media->last();
+    }
+
+    /*
+     * Get the url of the image for the given conversionName
+     * for first media for the given collectionName.
+     * If no profile is given, return the source's url.
+     */
+    public function getLastMediaUrl(string $collectionName = 'default', string $conversionName = ''): string
+    {
+        $media = $this->getLastMedia($collectionName);
+
+        if (! $media) {
+            return $this->getFallbackMediaUrl($collectionName) ?: '';
+        }
+
+        if ($conversionName !== '' && ! $media->hasGeneratedConversion($conversionName)) {
+            return $media->getUrl();
+        }
+
+        return $media->getUrl($conversionName);
+    }
+    /*
+         * Get the url of the image for the given conversionName
+         * for first media for the given collectionName.
+         *
+         * If no profile is given, return the source's url.
+         */
+    public function getLastTemporaryUrl(
+        DateTimeInterface $expiration,
+        string $collectionName = 'default',
+        string $conversionName = ''
+    ): string {
+        $media = $this->getLastMedia($collectionName);
+
+        if (! $media) {
+            return $this->getFallbackMediaUrl($collectionName) ?: '';
+        }
+
+        if ($conversionName !== '' && ! $media->hasGeneratedConversion($conversionName)) {
+            return $media->getTemporaryUrl($expiration);
+        }
+
+        return $media->getTemporaryUrl($expiration, $conversionName);
+    }
+    /*
+         * Get the url of the image for the given conversionName
+         * for first media for the given collectionName.
+         * If no profile is given, return the source's url.
+         */
+    public function getLastMediaPath(string $collectionName = 'default', string $conversionName = ''): string
+    {
+        $media = $this->getFirstMedia($collectionName);
+
+        if (! $media) {
+            return $this->getFallbackMediaPath($collectionName) ?: '';
+        }
+
+        if ($conversionName !== '' && ! $media->hasGeneratedConversion($conversionName)) {
+            return $media->getPath();
+        }
+
+        return $media->getPath($conversionName);
+    }
+    /*
+     * Last Media End
+     */
+
+    /*
      * Update a media collection by deleting and inserting again with new values.
      */
     public function updateMedia(array $newMediaArray, string $collectionName = 'default'): Collection
